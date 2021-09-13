@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  LineChannelAccessToken:
+    Type: String
+    Description: "LINE \u306E\u30A2\u30AF\u30BB\u30B9\u30C8\u30FC\u30AF\u30F3"
+  LineChannelSecret:
+    Type: String
+    Description: "LINE \u306E\u30C1\u30E3\u30F3\u30CD\u30EB\u30B7\u30FC\u30AF\u30EC\
+      \u30C3\u30C8"
+Resources:
+  EndPointFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.8
+      CodeUri: EndPointFunction
+      Handler: mylinebot.lambda_handler
+      Environment:
+        Variables:
+          LINE_CHANNEL_ACCESS_TOKEN:
+            Ref: LineChannelAccessToken
+          LINE_CHANNEL_SECRET:
+            Ref: LineChannelSecret
+      Policies:
+      - RekognitionDetectOnlyPolicy: {}
+      Events:
+        API:
+          Type: Api
+          Properties:
+            Path: /api_endpoint
+            Method: post
+Outputs:
+  ApiEndpointURL:
+    Description: API Endpoint URL
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApi.Stage}/api_endpoint
